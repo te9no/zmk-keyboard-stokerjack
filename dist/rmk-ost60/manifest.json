@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "target": "Stokerjack-OST60-nRF52840",
+  "release": "0.2.0-candidate",
+  "rmk_commit": "986017d901c7609a9a79167686524f014effa68a",
+  "start": 4096,
+  "end": 398340,
+  "storage_start": 966656,
+  "storage_end": 999424,
+  "telemetry": 536870920,
+  "build": 539365399,
+  "bin_sha256": "6df5d626d27976383f9a2699a243da29bb232eea74162618a99c5fdbce0e5438",
+  "bootloader_sha256": "ae141a80697c8c845529a07b9c8e0c2d3a944876e663d6a307e8ac313cb29b09",
+  "hardware_verified": false,
+  "requires": "ST-Link + existing Stokerjack Adafruit bootloader; OST4ML5B32A x4 / 60 keys only"
+}

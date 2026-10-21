@@ -1,0 +1,72 @@
+/dts-v1/;
+#include <nordic/nrf52840_qiaa.dtsi>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/led/led.h>
+#include <zephyr/dt-bindings/pinctrl/nrf-pinctrl.h>
+
+/ {
+    model = "Stokerjack MDBT50Q-1MV2";
+    compatible = "te9no,stokerjack";
+    behaviors {
+        sj_led: stokerjack_led {
+            compatible = "te9no,stokerjack-led";
+            #binding-cells = <0>;
+        };
+    };
+    chosen {
+        zephyr,sram = &sram0;
+        zephyr,flash = &flash0;
+        zephyr,code-partition = &application_partition;
+        zmk,battery = &vbatt;
+    };
+    vbatt: vbatt {
+        compatible = "zmk,battery-voltage-divider";
+        io-channels = <&adc 6>; /* P0.30 / AIN6, revised PCB only */
+        output-ohms = <470000>;
+        full-ohms = <1470000>;
+        mv-to-pct-thresholds = <2200 2300 2400 2440 2480 2520 2560 2600 2640 2700 2800>;
+    };
+};
+&flash0 {
+    partitions {
+        compatible = "fixed-partitions";
+        #address-cells = <1>;
+        #size-cells = <1>;
+        sd_partition: partition@0 { reg = <0x0 0x26000>; };
+        application_partition: partition@26000 {
+            label = "application";
+            reg = <0x26000 0xc6000>;
+        };
+        boot_partition: partition@f4000 { reg = <0xf4000 0xc000>; };
+        storage_partition: partition@ec000 {
+            label = "storage";
+            reg = <0xec000 0x8000>;
+        };
+    };
+};
+&uicr {
+    gpio-as-nreset;
+};
+&reg0 {
+    status = "disabled";
+};
+&reg1 {
+    regulator-initial-mode = <NRF5X_REG_MODE_DCDC>;
+};
+&gpiote {
+    status = "okay";
+};
+&gpio0 {
+    status = "okay";
+};
+&gpio1 {
+    status = "okay";
+};
+/* P0.27 belongs exclusively to the OST three-level GPIO transport. */
+&spi3 { status = "disabled"; };
+&adc {
+    status = "okay";
+};
+zephyr_udc0: &usbd {
+    status = "okay";
+};

@@ -1,0 +1,6 @@
+name: stokerjack_ost4ml5b32a
+build:
+  cmake: .
+  settings:
+    board_root: .
+    dts_root: .

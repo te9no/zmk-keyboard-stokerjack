@@ -1,0 +1,46 @@
+[
+  {
+    "path": "dist/ost4ml5b32a/Stokerjack_OST_gradient_58.hex",
+    "sha256": "9c750e629156ee10a083c9a4a579b924234dbf2c9695c795c06e867de7a1bf21"
+  },
+  {
+    "path": "dist/ost4ml5b32a/Stokerjack_OST_gradient_58.uf2",
+    "sha256": "3dc17ab8446fcfad2bf72b4bae62aff863c167710f96a4263f4fdf11bf53eedd"
+  },
+  {
+    "path": "dist/ost4ml5b32a/Stokerjack_OST_gradient_60.hex",
+    "sha256": "63800be8130ae8916ccc413bb42b28c32ea3ec6cbe113ad74b53c6aaf8506b61"
+  },
+  {
+    "path": "dist/ost4ml5b32a/Stokerjack_OST_gradient_60.uf2",
+    "sha256": "651b7beabc4debcf38e5cb59291c058d0ecfe7c3451165a535bc7bad9685001d"
+  },
+  {
+    "path": "dist/rmk-ost60/manifest.json",
+    "sha256": "76e410b1909663f13afa3b61f81502fcf67ae480aa3895e1a206a11f1079e952"
+  },
+  {
+    "path": "dist/rmk-ost60/stokerjack-rmk.bin",
+    "sha256": "6df5d626d27976383f9a2699a243da29bb232eea74162618a99c5fdbce0e5438"
+  },
+  {
+    "path": "dist/rmk-ost60/stokerjack-rmk.hex",
+    "sha256": "16cc393b45fe011afd0230a8a3e3b46c64177c2c5f0725c61c9c77b0dbe22d02"
+  },
+  {
+    "path": "dist/status-led/Stokerjack_58.hex",
+    "sha256": "705796b7d6cbbb74c32f5d13e71430d9eaa04f595a73ff250b441d528285455f"
+  },
+  {
+    "path": "dist/status-led/Stokerjack_58.uf2",
+    "sha256": "80a149907a9bd1b7ed202db35a1122d035320033be3f1b86a6f4d8a283392ae4"
+  },
+  {
+    "path": "dist/status-led/Stokerjack_60.hex",
+    "sha256": "7f201e2667dc0a3e67b5003ea8a22aef9f0f3401e04af6924f3021542e3b97ec"
+  },
+  {
+    "path": "dist/status-led/Stokerjack_60.uf2",
+    "sha256": "d37340e0dd83a75fa031a9b0a5108e7c1cf1c658a5ea7151285040b2fc280370"
+  }
+]

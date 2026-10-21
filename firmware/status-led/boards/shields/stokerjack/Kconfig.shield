@@ -1,0 +1,4 @@
+config SHIELD_STOKERJACK_60
+    def_bool $(shields_list_contains,stokerjack_60)
+config SHIELD_STOKERJACK_58
+    def_bool $(shields_list_contains,stokerjack_58)

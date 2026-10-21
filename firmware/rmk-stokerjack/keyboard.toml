@@ -1,0 +1,37 @@
+[rmk]
+ble_profiles_num = 5
+
+[event.keyboard]
+channel_size = 16
+pubs = 4
+subs = 8
+
+[event.action]
+channel_size = 16
+pubs = 4
+subs = 8
+
+[event.layer_change]
+channel_size = 16
+pubs = 4
+subs = 8
+
+[event.led_indicator]
+channel_size = 16
+pubs = 4
+subs = 8
+
+[event.connection_status_change]
+channel_size = 16
+pubs = 4
+subs = 8
+
+[event.sleep_state]
+channel_size = 16
+pubs = 4
+subs = 8
+
+[event.battery_status]
+channel_size = 16
+pubs = 4
+subs = 8

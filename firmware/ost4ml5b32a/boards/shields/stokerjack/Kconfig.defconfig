@@ -1,0 +1,4 @@
+if SHIELD_STOKERJACK_60 || SHIELD_STOKERJACK_58
+config ZMK_KEYBOARD_NAME
+    default "Stokerjack"
+endif

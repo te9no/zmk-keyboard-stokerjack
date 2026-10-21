@@ -1,0 +1,7 @@
+include:
+  - board: stokerjack
+    shield: stokerjack_60
+    artifact-name: Stokerjack_60_SWD
+  - board: stokerjack
+    shield: stokerjack_58
+    artifact-name: Stokerjack_58_SWD

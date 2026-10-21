@@ -1,0 +1,5 @@
+board:
+  name: stokerjack
+  vendor: te9no
+  socs:
+    - name: nrf52840

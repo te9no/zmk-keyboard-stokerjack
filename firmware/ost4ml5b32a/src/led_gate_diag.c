@@ -17,9 +17,11 @@ LOG_MODULE_REGISTER(stokerjack_gate, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/keymap.h>
 #include <zmk/endpoints.h>
 #include <zmk/events/battery_state_changed.h>
+#include <zmk/events/ble_active_profile_changed.h>
 #include "manual_status.h"
 
 static atomic_t requested_display = ATOMIC_INIT(SJ_BATTERY);
+static atomic_t last_profile = ATOMIC_INIT(-1);
 static atomic_t battery_percent = ATOMIC_INIT(-1);
 
 static int on_battery(const zmk_event_t *event)
@@ -35,17 +37,18 @@ static void fill_pixels(struct led_rgb pixels[4])
 {
     struct sj_status status = {.display = atomic_get(&requested_display),
                                .battery = atomic_get(&battery_percent)};
-    if (status.display == SJ_LINK) {
-        status.usb = zmk_endpoint_get_selected().transport == ZMK_TRANSPORT_USB;
+    if (status.display == SJ_LINK || status.display == SJ_PROFILE) {
+        status.usb = status.display == SJ_LINK && zmk_endpoint_get_selected().transport == ZMK_TRANSPORT_USB;
         status.profile = zmk_ble_active_profile_index();
         status.connected = status.usb || zmk_ble_active_profile_is_connected();
     }
+    if (status.display == SJ_PROFILE) LOG_DBG("Displaying wireless slot %d", status.profile + 1);
     for (int i = 0; i < 4; ++i) {
         /* The first LED on DIN is the rightmost LED on the assembled board. */
         int position_from_left = 3 - i;
         pixels[i] = sj_pixel(&status, position_from_left, 0);
         /* Amber marks a disconnected slot without repeated LED transfers. */
-        if (status.display == SJ_LINK && !status.connected && pixels[i].b) {
+        if ((status.display == SJ_LINK || status.display == SJ_PROFILE) && !status.connected && pixels[i].b) {
             pixels[i] = (struct led_rgb){.r=7, .g=3};
         }
     }
@@ -145,7 +148,10 @@ static void advance_dawn(struct k_work *work)
 {
     if (!atomic_get(&boot_animation)) return;
     if (!prepare_strip(&dawn_work)) return;
-    if (boot_frame == 0) LOG_DBG("LED startup frames begin");
+    if (boot_frame == 0) {
+        atomic_cas(&last_profile, -1, zmk_ble_active_profile_index());
+        LOG_DBG("LED startup frames begin");
+    }
     if (boot_frame == DAWN_FRAMES) {
         LOG_DBG("LED startup frames complete");
         atomic_clear(&boot_animation);
@@ -171,12 +177,24 @@ static void show_battery_after_fn(struct k_work *work)
 
 static void request_status(enum sj_display display)
 {
+    atomic_cas(&last_profile, -1, zmk_ble_active_profile_index());
     atomic_clear(&boot_animation);
     k_work_cancel_delayable(&dawn_work);
     k_work_cancel_delayable(&fn_followup);
     atomic_set(&requested_display, display);
     k_work_reschedule(&display_work, K_NO_WAIT);
 }
+
+static int on_profile(const zmk_event_t *event)
+{
+    int profile = as_zmk_ble_active_profile_changed(event)->index;
+    int previous = atomic_set(&last_profile, profile);
+    /* Reconnect notifications repeat the same index; keep idle LEDs asleep. */
+    if (previous >= 0 && previous != profile) request_status(SJ_PROFILE);
+    return ZMK_EV_EVENT_BUBBLE;
+}
+ZMK_LISTENER(stokerjack_profile_led, on_profile);
+ZMK_SUBSCRIPTION(stokerjack_profile_led, zmk_ble_active_profile_changed);
 #endif
 
 static int on_layer(const zmk_event_t *event)
@@ -189,7 +207,7 @@ static int on_layer(const zmk_event_t *event)
         switch (active) {
         case FN_LAYER:  request_status(SJ_FN_LAYER); break;
         case NUM_LAYER: request_status(SJ_NUM); break;
-        case BT_LAYER:  request_status(SJ_BT_LAYER); break;
+        case BT_LAYER:  request_status(SJ_PROFILE); break;
         }
     }
 #else

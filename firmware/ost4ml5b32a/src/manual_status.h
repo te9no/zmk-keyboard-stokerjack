@@ -4,7 +4,7 @@
 #define SJ_FRAME_MS 20
 #define SJ_FRAMES 120
 
-enum sj_display { SJ_BATTERY, SJ_LINK, SJ_NUM, SJ_CAPS, SJ_FN_LAYER, SJ_BT_LAYER };
+enum sj_display { SJ_BATTERY, SJ_LINK, SJ_NUM, SJ_CAPS, SJ_FN_LAYER, SJ_PROFILE };
 struct sj_status {
     enum sj_display display;
     int battery, profile;
@@ -24,6 +24,7 @@ static struct led_rgb sj_pixel(const struct sj_status *s, int i, unsigned frame)
         return (struct led_rgb){.g=14};
     }
     case SJ_LINK:
+    case SJ_PROFILE:
         if (!s->connected && (frame / 20) % 2) return black;
         if (s->usb) return (struct led_rgb){.r=8, .g=8, .b=8};
         if (s->profile == i || (s->profile == 4 && (i == 0 || i == 3)))
@@ -31,8 +32,6 @@ static struct led_rgb sj_pixel(const struct sj_status *s, int i, unsigned frame)
         return black;
     case SJ_FN_LAYER:
         return i == 0 ? (struct led_rgb){.r=8, .b=12} : black;
-    case SJ_BT_LAYER:
-        return i < 3 ? (struct led_rgb){.g=8, .b=10} : black;
     case SJ_NUM:
         return i < 2 ? (struct led_rgb){.r=12,.g=6} : black;
     case SJ_CAPS:

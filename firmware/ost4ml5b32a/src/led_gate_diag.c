@@ -3,10 +3,13 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 #include <drivers/behavior.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/layer_state_changed.h>
 #include "ost_transport.h"
+
+LOG_MODULE_REGISTER(stokerjack_gate, CONFIG_ZMK_LOG_LEVEL);
 
 #ifdef STOKERJACK_MANUAL_STATUS
 #include <zephyr/sys/atomic.h>
@@ -64,32 +67,66 @@ static void show_battery_after_fn(struct k_work *work);
 K_WORK_DELAYABLE_DEFINE(fn_followup, show_battery_after_fn);
 #endif
 
+/* All gate transitions after init run on the same system workqueue. */
+static bool rail_on, needs_sync;
+static int64_t rail_ready_at;
+
 static void gate_off(struct k_work *work)
 {
     ost_data_release();
-    gpio_pin_set_raw(port, LED_GATE_PIN, 1);
+    int err = gpio_pin_set_raw(port, LED_GATE_PIN, 1);
+    if (err) LOG_ERR("LED gate off failed (%d)", err);
+    rail_on = false;
 }
 K_WORK_DELAYABLE_DEFINE(switch_off, gate_off);
 
+/* Wait for the switched rail without blocking the wireless workqueue. */
+static bool prepare_strip(struct k_work_delayable *resume)
+{
+    if (!rail_on) {
+        ost_data_release();
+        int err = gpio_pin_configure(port, LED_GATE_PIN, GPIO_OUTPUT_LOW);
+        if (err) {
+            LOG_ERR("LED gate enable failed (%d)", err);
+            return false;
+        }
+        rail_on = true;
+        needs_sync = true;
+        rail_ready_at = k_uptime_get() + 50;
+    }
+    int64_t remaining = rail_ready_at - k_uptime_get();
+    if (remaining > 0) {
+        k_work_reschedule(resume, K_MSEC(remaining));
+        return false;
+    }
+    if (needs_sync) {
+        const struct led_rgb black[4] = {0};
+        ost_write(black);  /* Full frame and latch before the first visible color. */
+        needs_sync = false;
+    }
+    return true;
+}
+
+static void show_pixels(struct k_work *work);
+K_WORK_DELAYABLE_DEFINE(display_work, show_pixels);
 static void show_pixels(struct k_work *work)
 {
     struct led_rgb pixels[4] = {0};
-    ost_data_release();
-    if (gpio_pin_set_raw(port, LED_GATE_PIN, 0) < 0) return;
+    if (!prepare_strip(&display_work)) return;
     if (k_work_reschedule(&switch_off, DISPLAY_DURATION) < 0) {
         gate_off(NULL);
         return;
     }
-    k_msleep(10);
     fill_pixels(pixels);
     ost_write(pixels);
+    LOG_DBG("LED status frame sent");
 #ifdef STOKERJACK_MANUAL_STATUS
     if (atomic_get(&requested_display) == SJ_FN_LAYER) {
         k_work_reschedule(&fn_followup, K_MSEC(450));
     }
 #endif
 }
-K_WORK_DEFINE(display_work, show_pixels);
+
 
 #ifdef STOKERJACK_MANUAL_STATUS
 /* Serial chain index zero is on the right. Stagger the same dawn pulse
@@ -100,21 +137,17 @@ static const struct led_rgb dawn_pulse[] = {
 };
 enum { DAWN_STAGGER = 2, DAWN_FRAMES = ARRAY_SIZE(dawn_pulse) + 3 * DAWN_STAGGER };
 static atomic_t boot_animation = ATOMIC_INIT(1);
-static int boot_frame = -1;
+static int boot_frame;
 static void advance_dawn(struct k_work *work);
 K_WORK_DELAYABLE_DEFINE(dawn_work, advance_dawn);
 
 static void advance_dawn(struct k_work *work)
 {
     if (!atomic_get(&boot_animation)) return;
-    if (boot_frame < 0) {
-        ost_data_release();
-        if (gpio_pin_set_raw(port, LED_GATE_PIN, 0) < 0) return;
-        boot_frame = 0;
-        k_work_reschedule(&dawn_work, K_MSEC(10));
-        return;
-    }
+    if (!prepare_strip(&dawn_work)) return;
+    if (boot_frame == 0) LOG_DBG("LED startup frames begin");
     if (boot_frame == DAWN_FRAMES) {
+        LOG_DBG("LED startup frames complete");
         atomic_clear(&boot_animation);
         gate_off(NULL);
         return;
@@ -132,7 +165,7 @@ static void advance_dawn(struct k_work *work)
 static void show_battery_after_fn(struct k_work *work)
 {
     if (atomic_cas(&requested_display, SJ_FN_LAYER, SJ_BATTERY)) {
-        k_work_submit(&display_work);
+        k_work_reschedule(&display_work, K_NO_WAIT);
     }
 }
 
@@ -142,7 +175,7 @@ static void request_status(enum sj_display display)
     k_work_cancel_delayable(&dawn_work);
     k_work_cancel_delayable(&fn_followup);
     atomic_set(&requested_display, display);
-    k_work_submit(&display_work);
+    k_work_reschedule(&display_work, K_NO_WAIT);
 }
 #endif
 
@@ -160,7 +193,7 @@ static int on_layer(const zmk_event_t *event)
         }
     }
 #else
-    if (layer && layer->layer == FN_LAYER && layer->state) k_work_submit(&display_work);
+    if (layer && layer->layer == FN_LAYER && layer->state) k_work_reschedule(&display_work, K_NO_WAIT);
 #endif
     return ZMK_EV_EVENT_BUBBLE;
 }
@@ -172,7 +205,7 @@ static int pressed(struct zmk_behavior_binding *binding, struct zmk_behavior_bin
 #ifdef STOKERJACK_MANUAL_STATUS
     request_status(SJ_LINK);
 #else
-    k_work_submit(&display_work);
+    k_work_reschedule(&display_work, K_NO_WAIT);
 #endif
     return ZMK_BEHAVIOR_OPAQUE;
 }
@@ -186,7 +219,8 @@ static int init(const struct device *dev)
     ost_data_release();
     int err = gpio_pin_configure(port, LED_GATE_PIN, GPIO_OUTPUT_HIGH);
 #ifdef STOKERJACK_MANUAL_STATUS
-    if (!err) k_work_schedule(&dawn_work, K_MSEC(180));
+    if (err) LOG_ERR("LED gate init failed (%d)", err);
+    else k_work_schedule(&dawn_work, K_MSEC(180));
 #endif
     return err;
 }

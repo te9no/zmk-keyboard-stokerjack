@@ -42,6 +42,7 @@ jobs:
       - name: Build the 60-key OST firmware with DYA Studio
         run: |
           bash firmware/ost4ml5b32a/build.sh studio60
+          grep -qx CONFIG_SETTINGS_NVS=y "$ZMK_WORKSPACE/build/stokerjack-studio60/zephyr/.config"
           mkdir -p artifacts
           cd artifacts
           cp "$ZMK_WORKSPACE/build/stokerjack-studio60/zephyr/zmk.uf2" Stokerjack_OST_1M_Studio_CDC_Debug_60.uf2

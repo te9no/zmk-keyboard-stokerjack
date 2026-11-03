@@ -1,0 +1,57 @@
+/* GeaconSolstice US adapted to the Stokerjack 5 x 12 physical layout. */
+#include <behaviors.dtsi>
+#include <behaviors/runtime_macro.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+
+#define FUNC 1
+#define NUM 2
+#define BT 3
+
+&mt { flavor = "tap-preferred"; };
+
+/ {
+    keymap {
+        compatible = "zmk,keymap";
+        def_layer {
+            display-name = "Def";
+            bindings = <
+                &kp CAPS        &kp N1          &kp N2          &kp N3          &kp N4          &kp N5          &kp N6          &kp N7          &kp N8          &kp N9          &kp N0          &kp BKSP
+                &kp TAB         &kp Q           &kp W           &kp E           &kp R           &kp T           &kp Y           &kp U           &kp I           &kp O           &kp P           &lt BT BSLH
+                &lt BT CAPS     &kp A           &kp S           &kp D           &kp F           &kp G           &kp H           &kp J           &kp K           &kp L           &kp SEMI        &kp ENTER
+                &kp LSHFT       &kp Z           &kp X           &kp C           &kp V           &kp B           &kp N           &kp M           &kp COMMA       &kp DOT         &kp FSLH        &kp RSHFT
+                &mt LCTL ESC    &kp LGUI        &kp LALT        &lt NUM SPACE   &lt FUNC SPACE  &kp SPACE       &kp SPACE       &lt FUNC SPACE  &lt NUM UP      &kp LEFT        &kp DOWN        &kp RIGHT
+            >;
+        };
+        fnc_layer {
+            display-name = "Fnc";
+            bindings = <
+                &kp GRAVE       &kp F1          &kp F2          &kp F3          &kp F4          &kp F5          &kp F6          &kp F7          &kp F8          &kp F9          &kp F10         &kp F11
+                &trans          &kp PG_UP       &kp UP          &kp PG_DN       &kp HOME        &studio_unlock  &kp MINUS       &kp EQUAL       &kp LBKT        &kp RBKT        &kp F12         &kp PSCRN
+                &trans          &kp LEFT        &kp DOWN        &kp RIGHT       &kp END         &trans          &trans          &trans          &trans          &trans          &kp SQT         &trans
+                &trans          &kp BKSP        &kp DEL         &trans          &trans          &trans          &trans          &trans          &trans          &trans          &sj_led         &trans
+                &trans          &trans          &kp LALT        &kp ENTER       &kp ENTER       &kp ENTER       &kp ENTER       &kp ENTER       &trans          &trans          &trans          &trans
+            >;
+        };
+        num_layer {
+            display-name = "Num";
+            bindings = <
+                &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans
+                &kp CAPS        &kp N1          &kp N2          &kp N3          &kp N4          &kp N5          &kp N6          &kp N7          &kp N8          &kp N9          &kp N0          &trans
+                &trans          &trans          &trans          &trans          &trans          &trans          &kp MINUS       &kp EQUAL       &kp LBKT        &kp RBKT        &kp BSLH        &kp SQT
+                &trans          &kp BKSP        &kp DEL         &trans          &trans          &trans          &trans          &kp FSLH        &kp SEMI        &kp SQT         &trans          &trans
+                &trans          &kp ENTER       &kp ENTER       &kp ENTER       &kp ENTER       &kp ENTER       &kp ENTER       &kp ENTER       &trans          &trans          &trans          &trans
+            >;
+        };
+        bt_layer {
+            display-name = "BT";
+            bindings = <
+                &bt BT_CLR      &bt BT_SEL 0    &bt BT_SEL 1    &bt BT_SEL 2    &bt BT_SEL 3    &bt BT_SEL 4    &trans          &trans          &trans          &trans          &trans          &trans
+                &trans          &trans          &trans          &trans          &trans          &trans          &bt BT_CLR_ALL  &trans          &trans          &trans          &trans          &trans
+                &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans
+                &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans
+                &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans          &trans
+            >;
+        };
+    };
+};

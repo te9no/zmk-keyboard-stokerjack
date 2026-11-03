@@ -7,6 +7,7 @@ Stokerjack（MDBT50Q-1MV2 / nRF52840）のファームウェアとソースコ�
 
 | 版 | コード | 書き込みファイル | 状況 |
 |---|---|---|---|
+| ZMK / OST砲弾型・60キー・DYA Studio | [Solstice US配列](firmware/ost4ml5b32a/config/stokerjack_solstice_us.keymap) | [実機書き込み済みUF2](dist/ost4ml5b32a/Stokerjack_OST_1M_Studio_CDC_Debug_60.uf2) | 起動時の4灯アニメーション、電池・レイヤー・接続先表示、USB/BLE入力 |
 | ZMK / OST4ML5B32A砲弾型×4 | [OSTソース](firmware/ost4ml5b32a) | [60・58キー用HEX/UF2](dist/ost4ml5b32a) | ビルド・プロトコル試験済み。OST版全体の実機検証は未完了 |
 | ZMK / 従来SMD LED×4 | [SMDソース](firmware/status-led) | [60・58キー用HEX/UF2](dist/status-led) | 60キーの書き込み・USB認識とLED動作の確認履歴あり。58キーはビルド確認 |
 | RMK / OST4ML5B32A砲弾型×4 | [RMKソース](firmware/rmk-stokerjack) | [60キー候補版BIN/HEX](dist/rmk-ost60) | ビルド・ホスト試験済み、実機未検証 |
@@ -25,6 +26,23 @@ HEXはアプリのみ（開始0x26000）。アドレス0へずらしたり、全
 LEDはFn＋LEDキー、Caps Lock、レイヤーや接続状態の変更で約2.4秒表示します。
 通常のキー入力では最大30秒に1回。消灯状態でもキーボードは動作します。
 NiMH単3×2本の電圧から残量を推定します。充電機能はありません。
+
+## 60キー DYA Studio版
+
+起動時に4灯が左から右へ流れます。Fn長押しで電池残量、Fn＋スラッシュで接続先を表示します。
+Aの左を押しながら上段の1〜5でBluetoothプロファイルを選びます。
+Studio用とログ用にUSBシリアルポートが1つずつあります。Studioは常時ロック解除で、ログ側を1200 bpsで開いて閉じるとUF2ブートローダーに入ります。
+
+この版をビルドするには、次のマニフェストでStudio拡張モジュールも取得してください。
+
+```sh
+west init -m https://github.com/te9no/zmk-keyboard-stokerjack --mf firmware/ost4ml5b32a/config/west.yml stokerjack-workspace
+cd stokerjack-workspace
+west update
+west zephyr-export
+export ZMK_WORKSPACE="$PWD"
+bash config/zmk-keyboard-Stokerjack/firmware/ost4ml5b32a/build.sh studio60
+```
 
 ## ZMKのビルド
 

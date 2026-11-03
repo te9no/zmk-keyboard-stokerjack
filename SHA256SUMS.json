@@ -1,5 +1,9 @@
 [
   {
+    "path": "dist/ost4ml5b32a/Stokerjack_OST_1M_Studio_CDC_Debug_60.uf2",
+    "sha256": "695b59d7c43030d78dc250ff54a31a2b8fbf9cbb77db967c3cb1d0e8000bf202"
+  },
+  {
     "path": "dist/ost4ml5b32a/Stokerjack_OST_gradient_58.hex",
     "sha256": "9c750e629156ee10a083c9a4a579b924234dbf2c9695c795c06e867de7a1bf21"
   },

@@ -1,0 +1,54 @@
+name: Build Stokerjack Studio 60
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'firmware/ost4ml5b32a/**'
+      - '.github/workflows/build-studio60.yml'
+  pull_request:
+    paths:
+      - 'firmware/ost4ml5b32a/**'
+      - '.github/workflows/build-studio60.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    container: zmkfirmware/zmk-build-arm:stable
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Fetch pinned ZMK dependencies
+        run: |
+          workspace="$RUNNER_TEMP/stokerjack-west"
+          mkdir -p "$workspace/config"
+          cp firmware/ost4ml5b32a/config/west.yml "$workspace/config/"
+          cd "$workspace"
+          west init -l config
+          west update --fetch-opt=--filter=tree:0
+          west zephyr-export
+          echo "ZMK_WORKSPACE=$workspace" >> "$GITHUB_ENV"
+
+      - name: Build the 60-key OST firmware with DYA Studio
+        run: |
+          bash firmware/ost4ml5b32a/build.sh studio60
+          mkdir -p artifacts
+          cd artifacts
+          cp "$ZMK_WORKSPACE/build/stokerjack-studio60/zephyr/zmk.uf2" Stokerjack_OST_1M_Studio_CDC_Debug_60.uf2
+          sha256sum Stokerjack_OST_1M_Studio_CDC_Debug_60.uf2 > SHA256SUMS
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Stokerjack_OST_1M_Studio_CDC_Debug_60
+          path: artifacts/
+          if-no-files-found: error

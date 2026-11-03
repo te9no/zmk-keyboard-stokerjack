@@ -33,7 +33,9 @@ NiMH単3×2本の電圧から残量を推定します。充電機能はありま
 Aの左を押しながら上段の1〜5でBluetoothプロファイルを選びます。
 Studio用とログ用にUSBシリアルポートが1つずつあります。Studioは常時ロック解除で、ログ側を1200 bpsで開いて閉じるとUF2ブートローダーに入ります。
 
-この版をビルドするには、次のマニフェストでStudio拡張モジュールも取得してください。
+GitHubでビルドするには、[Build Stokerjack Studio 60](../../actions/workflows/build-studio60.yml) を開き、**Run workflow** で対象ブランチを選んで実行します。完了した実行の **Artifacts** から `Stokerjack_OST_1M_Studio_CDC_Debug_60` をダウンロードし、ZIP内のUF2を書き込みます。OST版のソースやワークフローを変更した場合は、プルリクエストと `main` への反映時にも自動ビルドします。
+
+手元でこの版をビルドするには、次のマニフェストでStudio拡張モジュールも取得してください。
 
 ```sh
 west init -m https://github.com/te9no/zmk-keyboard-stokerjack --mf firmware/ost4ml5b32a/config/west.yml stokerjack-workspace

@@ -1,0 +1,123 @@
+{
+  "files": [
+    {
+      "path": "acrylic/switch-plate-common-mm.dxf",
+      "sha256": "463997b1b5cd611deab338a1026557fb45b8bb8898584a67f4f2bee32036d78f",
+      "source_name": "SJ-M4-common-switch-plate-mm.dxf",
+      "source_date": "2026-10-15"
+    },
+    {
+      "path": "acrylic/middle-frame-common-mm.dxf",
+      "sha256": "eae91316badef3e9eaa72f68277eceb07781c0118855cf022f2dd2375514c8f0",
+      "source_name": "SJ-M4-common-middle-mm.dxf",
+      "source_date": "2026-10-15"
+    },
+    {
+      "path": "switch-plate-stl/switch-plate-left.stl",
+      "sha256": "2781cfa1549fa944e58b1d7b22fc975a9a37221e883afb9966d51a14bdabc080",
+      "source_name": "Stokerjack-left.stl",
+      "source_date": "2026-10-14"
+    },
+    {
+      "path": "switch-plate-stl/switch-plate-right.stl",
+      "sha256": "560071a22ba51deb1daa791917e22151777d2048c118c8426c06e23ed2470079",
+      "source_name": "Stokerjack-right.stl",
+      "source_date": "2026-10-14"
+    },
+    {
+      "path": "switch-plate-stl/switch-fit-test-14.0-14.1-14.2.stl",
+      "sha256": "4561f293b65bb9de1cda9726afa3fbfcc5309ce344a57d839d4d8592906369c9",
+      "source_name": "Stokerjack-fit-test-14.0-14.1-14.2.stl",
+      "source_date": "2026-10-14"
+    },
+    {
+      "path": "pcb-outline/board-outline.gko",
+      "sha256": "81d95264550076e4f269df35d2e1640790c275ff8dffd2333cdb2f4945b67af0",
+      "source_name": "Stokerjack-60-OST-R3-Gerber.zip",
+      "source_member": "Gerber_BoardOutlineLayer.GKO",
+      "source_sha256": "13bc81c86ae7a84586aa9e82e6e06b2aaa39dd632653df127cbceaba1439d7a6",
+      "source_date": "2026-10-26"
+    },
+    {
+      "path": "pcb-outline/board-outline-mm.dxf",
+      "sha256": "119aba40cb3773a737fbc5ecf8f9ad1d0de9ffc57acb5d4e228a638e65a01153",
+      "derived_from": "pcb-outline/board-outline.gko",
+      "conversion": "G01/G02/G03 centerlines in mm to one closed LWPOLYLINE with arc bulges; original coordinates retained",
+      "segments": 80
+    }
+  ],
+  "geometry_checks": {
+    "acrylic/middle-frame-common-mm.dxf": {
+      "units": "mm",
+      "closed_contours": 1,
+      "bounds_mm": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          115.25,
+          99.2
+        ]
+      ]
+    },
+    "acrylic/switch-plate-common-mm.dxf": {
+      "units": "mm",
+      "closed_contours": 31,
+      "bounds_mm": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          118.25,
+          99.2
+        ]
+      ]
+    },
+    "pcb-outline/board-outline-mm.dxf": {
+      "units": "mm",
+      "closed_contours": 1,
+      "bounds_mm": [
+        [
+          10.05,
+          -149.5
+        ],
+        [
+          294.75,
+          -55.29062
+        ]
+      ]
+    },
+    "switch-plate-stl/switch-fit-test-14.0-14.1-14.2.stl": {
+      "units": "mm",
+      "watertight": true,
+      "volume_mm3": 1079.325108325481,
+      "dimensions_mm": [
+        60.0,
+        22.0,
+        1.5
+      ]
+    },
+    "switch-plate-stl/switch-plate-left.stl": {
+      "units": "mm",
+      "watertight": true,
+      "volume_mm3": 6744.836951504636,
+      "dimensions_mm": [
+        112.25012969970703,
+        93.20011901855469,
+        1.5
+      ]
+    },
+    "switch-plate-stl/switch-plate-right.stl": {
+      "units": "mm",
+      "watertight": true,
+      "volume_mm3": 6744.822124117141,
+      "dimensions_mm": [
+        112.25008392333984,
+        93.20006561279297,
+        1.5
+      ]
+    }
+  }
+}
